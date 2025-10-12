@@ -1,0 +1,1818 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>神秘宝藏探险</title>
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Nunito:wght@300;400;600;800&display=swap" rel="stylesheet">
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+            font-family: 'Nunito', 'Segoe UI', 'Microsoft YaHei', sans-serif;
+        }
+        
+        :root {
+            /* 白色 + baby blue 可爱配色 */
+            --primary-dark: #072233; /* 深色文本/前景 */
+            --primary: #0b3b4a; /* 主色（深） */
+            --primary-light: #E9FBFF; /* 浅色背景 */
+            --accent: #A7E0FF; /* baby blue 主色 */
+            --accent-light: #DFF8FF; /* 更浅的 baby blue */
+            --accent-dark: #7ECFFF; /* 深一点的 baby blue */
+            --success: #FFC4E1; /* 马卡龙粉主色 */
+            --error: #FF6F61;
+            --text: #073642; /* 正文深色，保证白底可读性 */
+            --text-secondary: #577D86; /* 次要文字 */
+            --card-bg: rgba(245, 252, 255, 0.9); /* 白色偏蓝的卡片背景 */
+            --card-border: rgba(126, 207, 255, 0.45);
+        }
+        
+        body {
+            /* 白到 baby blue 的渐变背景，轻柔可爱 */
+            background: linear-gradient(180deg, #FFFFFF 0%, var(--accent-light) 100%);
+            color: var(--text);
+            min-height: 100vh;
+            padding: 20px;
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            overflow-x: hidden;
+            -webkit-font-smoothing: antialiased;
+            -moz-osx-font-smoothing: grayscale;
+        }
+        
+        .container {
+            max-width: 900px;
+            width: 100%;
+            text-align: center;
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+        }
+        
+        header {
+            margin-bottom: 30px;
+            padding: 20px;
+            border-bottom: 1px solid var(--card-border);
+            width: 100%;
+        }
+        
+        h1 {
+            font-size: 2.8rem;
+            margin-bottom: 10px;
+            background: linear-gradient(90deg, var(--accent-dark), var(--accent));
+            -webkit-background-clip: text;
+            background-clip: text;
+            color: transparent;
+            text-shadow: 0 6px 18px rgba(167, 224, 255, 0.45);
+            letter-spacing: 1px;
+        }
+        
+        .subtitle {
+            font-size: 1.2rem;
+            color: var(--text-secondary);
+            font-weight: 300;
+        }
+        
+        /* 全景地图样式 */
+        .panorama-view {
+            width: 100%;
+            max-width: 800px;
+            height: 500px;
+            position: relative;
+            border-radius: 16px;
+            overflow: hidden;
+            box-shadow: 0 12px 30px rgba(10, 38, 50, 0.06);
+            margin-bottom: 20px;
+            background: linear-gradient(145deg, #FFFFFF, var(--accent-light));
+            border: 1px solid var(--card-border);
+        }
+        
+        .location {
+            position: absolute;
+            width: 80px;
+            height: 80px;
+            border-radius: 50%;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            cursor: pointer;
+            transition: all 0.4s ease;
+            z-index: 10;
+            background: var(--card-bg);
+            border: 2px solid var(--accent-dark);
+            box-shadow: 0 6px 18px rgba(126, 207, 255, 0.25);
+            backdrop-filter: blur(6px);
+        }
+        
+        .location:hover {
+            transform: scale(1.18);
+            box-shadow: 0 10px 25px rgba(126, 207, 255, 0.35);
+            background: rgba(167, 224, 255, 0.25);
+        }
+        
+        .location-name {
+            position: absolute;
+            bottom: -30px;
+            left: 50%;
+            transform: translateX(-50%);
+            background: rgba(255, 255, 255, 0.95);
+            padding: 6px 12px;
+            border-radius: 12px;
+            font-size: 0.85rem;
+            white-space: nowrap;
+            opacity: 0;
+            transition: opacity 0.3s ease;
+            color: var(--text);
+            border: 1px solid var(--card-border);
+            backdrop-filter: blur(6px);
+        }
+        
+        .location:hover .location-name {
+            opacity: 1;
+        }
+        
+        .location-icon {
+            font-size: 1.8rem;
+            filter: drop-shadow(0 2px 4px rgba(0, 0, 0, 0.3));
+        }
+        
+        /* 位置定义 */
+        .library {
+            top: 20%;
+            left: 20%;
+        }
+        
+        .tavern {
+            top: 25%;
+            right: 25%;
+        }
+        
+        .forest {
+            top: 60%;
+            left: 30%;
+        }
+        
+        .temple {
+            top: 40%;
+            right: 15%;
+        }
+        
+        .mountain {
+            bottom: 20%;
+            right: 40%;
+        }
+        
+        /* 音乐控制 */
+        .music-controls {
+            position: fixed;
+            top: 20px;
+            right: 20px;
+            z-index: 100;
+        }
+        
+        .music-btn {
+            width: 50px;
+            height: 50px;
+            border-radius: 50%;
+            background: var(--accent);
+            border: none;
+            color: var(--primary-dark);
+            font-size: 1.5rem;
+            cursor: pointer;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            box-shadow: 0 6px 18px rgba(126, 207, 255, 0.35);
+            transition: all 0.3s ease;
+            font-weight: bold;
+        }
+        
+        .music-btn:hover {
+            transform: scale(1.1);
+            background: var(--accent-light);
+            box-shadow: 0 6px 20px rgba(255, 215, 0, 0.6);
+        }
+        
+        .music-selector {
+            position: absolute;
+            top: 60px;
+            right: 0;
+            background: rgba(255,255,255,0.95);
+            border-radius: 12px;
+            padding: 12px;
+            display: none;
+            flex-direction: column;
+            gap: 8px;
+            min-width: 160px;
+            border: 1px solid var(--card-border);
+            backdrop-filter: blur(6px);
+        }
+        
+        .music-option {
+            padding: 10px 14px;
+            background: rgba(245,252,255,0.9);
+            border: none;
+            border-radius: 8px;
+            color: var(--text);
+            cursor: pointer;
+            text-align: left;
+            transition: all 0.2s ease;
+            font-size: 0.9rem;
+        }
+        
+        .music-option:hover {
+            background: rgba(255, 215, 0, 0.2);
+        }
+        
+        .music-option.active {
+            background: rgba(255, 215, 0, 0.3);
+            color: var(--accent-light);
+        }
+        
+        .music-controls:hover .music-selector {
+            display: flex;
+        }
+        
+        /* 游戏区域样式 */
+        .game-area {
+            display: flex;
+            flex-direction: column;
+            gap: 20px;
+            margin-bottom: 30px;
+            align-items: center;
+            width: 100%;
+        }
+        
+        .treasure-map {
+            background: var(--card-bg);
+            border-radius: 20px;
+            padding: 26px;
+            min-height: 450px;
+            display: flex;
+            flex-direction: column;
+            justify-content: center;
+            align-items: center;
+            position: relative;
+            overflow: hidden;
+            border: 1px solid var(--card-border);
+            box-shadow: 0 8px 20px rgba(10, 38, 50, 0.06);
+            width: 100%;
+            max-width: 800px;
+            backdrop-filter: blur(5px);
+        }
+        
+        .map-content {
+            width: 100%;
+            height: 100%;
+            display: flex;
+            flex-direction: column;
+            justify-content: center;
+            align-items: center;
+        }
+        
+        .location-scene {
+            width: 100%;
+            max-width: 600px;
+            height: 280px;
+            border-radius: 12px;
+            margin: 20px 0;
+            box-shadow: 0 8px 25px rgba(0, 0, 0, 0.1);
+            transition: all 0.5s ease;
+            border: 1px solid var(--card-border);
+            background-color: var(--primary-light);
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            justify-content: center;
+            color: var(--text-secondary);
+            font-style: italic;
+            overflow: hidden;
+            position: relative;
+            padding: 20px;
+        }
+        
+        .scene-emoji {
+            font-size: 4rem;
+            margin-bottom: 15px;
+            filter: drop-shadow(0 4px 8px rgba(0, 0, 0, 0.2));
+            animation: float 3s ease-in-out infinite;
+        }
+        
+        @keyframes float {
+            0%, 100% { transform: translateY(0px); }
+            50% { transform: translateY(-10px); }
+        }
+        
+        .scene-title {
+            font-size: 1.5rem;
+            font-weight: 600;
+            color: var(--text);
+            margin-bottom: 10px;
+        }
+        
+        .scene-description {
+            font-size: 1rem;
+            color: var(--text-secondary);
+            text-align: center;
+            max-width: 80%;
+            line-height: 1.5;
+        }
+        
+        .clue-text {
+            font-size: 1.4rem;
+            margin: 20px 0;
+            min-height: 100px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            padding: 20px;
+            background: var(--card-bg);
+            border-radius: 12px;
+            width: 90%;
+            transition: all 0.5s ease;
+            line-height: 1.6;
+            border: 1px solid var(--card-border);
+            color: var(--text);
+        }
+        
+        .animated-text {
+            animation: textGlow 2s infinite alternate;
+        }
+        
+        @keyframes textGlow {
+            from { 
+                text-shadow: 0 0 5px var(--text); 
+                color: var(--text);
+            }
+            to { 
+                text-shadow: 0 0 15px var(--accent-light), 0 0 20px var(--accent); 
+                color: var(--accent-light);
+            }
+        }
+        
+        .step-indicator-container {
+            display: flex;
+            justify-content: center;
+            width: 100%;
+            margin: 20px 0;
+        }
+        
+        .step-indicator {
+            display: flex;
+            justify-content: center;
+            flex-wrap: wrap;
+            gap: 15px;
+            max-width: 800px;
+            width: 100%;
+        }
+        
+        .step {
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            width: 120px;
+        }
+        
+        .step-circle {
+            width: 50px;
+            height: 50px;
+            border-radius: 50%;
+            background: var(--primary-light);
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-weight: bold;
+            font-size: 1.2rem;
+            transition: all 0.3s ease;
+            margin-bottom: 5px;
+            color: var(--text);
+            border: 1px solid var(--card-border);
+        }
+        
+        .step-circle.active {
+            background: var(--accent);
+            transform: scale(1.2);
+            box-shadow: 0 0 15px var(--accent);
+            color: var(--primary-dark);
+        }
+        
+        .step-circle.completed {
+            background: var(--success);
+            color: white;
+            box-shadow: 0 8px 20px rgba(255,196,225,0.18);
+        }
+        
+        .step-label {
+            font-size: 0.9rem;
+            text-align: center;
+            color: var(--text-secondary);
+            height: 40px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+        }
+        
+        .choice-container {
+            display: flex;
+            flex-direction: column;
+            gap: 15px;
+            width: 90%;
+            max-width: 600px;
+            margin: 20px 0;
+        }
+        
+        .choice-btn {
+            padding: 16px 20px;
+            background: linear-gradient(135deg, var(--card-bg), var(--accent-light));
+            border: 1px solid var(--card-border);
+            border-radius: 14px;
+            color: var(--text);
+            font-size: 1.1rem;
+            cursor: pointer;
+            transition: all 0.22s ease;
+            text-align: left;
+            box-shadow: 0 10px 20px rgba(10, 38, 50, 0.05);
+            display: flex;
+            align-items: center;
+            gap: 12px;
+        }
+        
+        .choice-btn:hover {
+            transform: translateY(-3px);
+            box-shadow: 0 12px 22px rgba(10, 38, 50, 0.06);
+            background: linear-gradient(135deg, var(--accent-light), var(--accent));
+            border-color: var(--accent-dark);
+        }
+        
+        .choice-btn:active {
+            transform: translateY(1px);
+        }
+        
+        .choice-emoji {
+            font-size: 1.3rem;
+            flex-shrink: 0;
+        }
+        
+        .controls {
+            display: flex;
+            gap: 15px;
+            justify-content: center;
+            flex-wrap: wrap;
+            margin-top: 20px;
+        }
+        
+        .action-btn {
+            padding: 14px 28px;
+            background: linear-gradient(135deg, var(--accent), var(--accent-dark));
+            border: none;
+            border-radius: 999px;
+            color: var(--primary-dark);
+            font-size: 1.1rem;
+            cursor: pointer;
+            transition: all 0.22s ease;
+            box-shadow: 0 12px 26px rgba(126, 207, 255, 0.2);
+            font-weight: 700;
+            letter-spacing: 0.4px;
+        }
+        
+        .action-btn:hover {
+            transform: translateY(-3px);
+            box-shadow: 0 14px 28px rgba(126, 207, 255, 0.3);
+            background: linear-gradient(135deg, var(--accent-light), var(--accent));
+        }
+        
+        .action-btn:active {
+            transform: translateY(1px);
+        }
+        
+        .action-btn:disabled {
+            background: var(--primary-light);
+            color: var(--text-secondary);
+            cursor: not-allowed;
+            transform: none;
+            box-shadow: none;
+        }
+        
+        .back-btn {
+            background: linear-gradient(135deg, var(--accent-light), var(--accent-dark));
+            box-shadow: 0 8px 18px rgba(126, 207, 255, 0.25);
+        }
+
+        .back-btn:hover {
+            background: linear-gradient(135deg, var(--accent), var(--accent-dark));
+            box-shadow: 0 12px 24px rgba(126, 207, 255, 0.32);
+        }
+        
+        .treasure-animation {
+            font-size: 4rem;
+            margin: 20px 0;
+            animation: bounce 2s infinite;
+            filter: drop-shadow(0 5px 15px rgba(255, 215, 0, 0.7));
+        }
+        
+        @keyframes bounce {
+            0%, 100% { transform: translateY(0); }
+            50% { transform: translateY(-20px); }
+        }
+        
+        .success-message {
+            background: rgba(255,196,225,0.12);
+            padding: 25px;
+            border-radius: 16px;
+            margin: 20px 0;
+            border-left: 5px solid var(--success);
+            width: 90%;
+            border: 1px solid rgba(255,196,225,0.22);
+        }
+        
+        .error-message {
+            background: rgba(255, 111, 97, 0.15);
+            padding: 25px;
+            border-radius: 16px;
+            margin: 20px 0;
+            border-left: 5px solid var(--error);
+            width: 90%;
+            border: 1px solid rgba(255, 111, 97, 0.3);
+        }
+        
+        .treasure-items {
+            display: flex;
+            justify-content: center;
+            gap: 20px;
+            flex-wrap: wrap;
+            margin: 20px 0;
+        }
+        
+        .treasure-item {
+            width: 80px;
+            height: 80px;
+            background: linear-gradient(135deg, var(--accent-light), var(--accent));
+            border-radius: 12px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-size: 2.2rem;
+            box-shadow: 0 8px 30px rgba(167, 224, 255, 0.35);
+            animation: glow 3s infinite alternate;
+            border: 2px solid rgba(255,255,255,0.6);
+        }
+        
+        @keyframes glow {
+            from { 
+                box-shadow: 0 0 15px var(--accent); 
+                transform: scale(1);
+            }
+            to { 
+                box-shadow: 0 0 25px var(--accent-light), 0 0 35px var(--accent); 
+                transform: scale(1.05);
+            }
+        }
+        
+        .stats {
+            display: flex;
+            justify-content: space-around;
+            margin: 20px 0;
+            padding: 20px;
+            background: var(--card-bg);
+            border-radius: 16px;
+            width: 100%;
+            max-width: 600px;
+            border: 1px solid var(--card-border);
+        }
+        
+        .stat-item {
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+        }
+        
+        .stat-label {
+            font-size: 0.9rem;
+            color: var(--text-secondary);
+            margin-bottom: 5px;
+        }
+        
+        .stat-value {
+            font-size: 1.8rem;
+            font-weight: bold;
+            color: var(--accent);
+        }
+        
+        .thinking-container {
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            justify-content: center;
+            width: 100%;
+            margin: 20px 0;
+        }
+        
+        .thinking-text {
+            font-size: 1.2rem;
+            margin-bottom: 15px;
+            color: var(--accent);
+        }
+        
+        .thinking-animation {
+            display: flex;
+            justify-content: center;
+            gap: 8px;
+        }
+        
+        .thinking-dot {
+            width: 12px;
+            height: 12px;
+            border-radius: 50%;
+            background: var(--accent);
+            animation: thinking 1.4s infinite ease-in-out;
+        }
+        
+        .thinking-dot:nth-child(1) { animation-delay: -0.32s; }
+        .thinking-dot:nth-child(2) { animation-delay: -0.16s; }
+        
+        @keyframes thinking {
+            0%, 80%, 100% { 
+                transform: scale(0);
+                opacity: 0.5;
+            }
+            40% { 
+                transform: scale(1);
+                opacity: 1;
+            }
+        }
+        
+        footer {
+            margin-top: 30px;
+            padding: 20px;
+            border-top: 1px solid var(--card-border);
+            font-size: 0.9rem;
+            color: var(--text-secondary);
+        }
+        
+        /* 页面切换 */
+        .page {
+            display: none;
+            width: 100%;
+        }
+        
+        .page.active {
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+        }
+        
+        /* 音乐提示弹窗 */
+        .music-hint {
+            position: fixed;
+            top: 50%;
+            left: 50%;
+            transform: translate(-50%, -50%);
+            background: rgba(255,255,255,0.98);
+            color: var(--text);
+            padding: 26px;
+            border-radius: 14px;
+            border: 1px solid var(--card-border);
+            z-index: 1000;
+            max-width: 80%;
+            text-align: center;
+            box-shadow: 0 18px 40px rgba(10, 38, 50, 0.06);
+        }
+
+        .music-hint h3 {
+            color: var(--accent-dark);
+            margin-bottom: 12px;
+        }
+
+        .music-hint p {
+            margin-bottom: 8px;
+            line-height: 1.45;
+        }
+
+        .music-hint-btn {
+            margin-top: 16px;
+            padding: 10px 18px;
+            background: linear-gradient(90deg, var(--accent), var(--accent-dark));
+            border: none;
+            border-radius: 8px;
+            color: var(--primary-dark);
+            font-weight: bold;
+            cursor: pointer;
+            transition: all 0.25s ease;
+        }
+
+        .music-hint-btn:hover {
+            transform: scale(1.03);
+            box-shadow: 0 10px 20px rgba(126, 207, 255, 0.2);
+        }
+        
+        @media (max-width: 600px) {
+            h1 {
+                font-size: 2.2rem;
+            }
+            
+            .clue-text {
+                font-size: 1.1rem;
+            }
+            
+            .choice-btn, .action-btn {
+                padding: 12px 18px;
+                font-size: 1rem;
+            }
+            
+            .treasure-animation {
+                font-size: 3rem;
+            }
+            
+            .location-scene {
+                height: 200px;
+            }
+            
+            .scene-emoji {
+                font-size: 3rem;
+            }
+            
+            .step {
+                width: 90px;
+            }
+            
+            .step-circle {
+                width: 40px;
+                height: 40px;
+                font-size: 1rem;
+            }
+            
+            .step-label {
+                font-size: 0.8rem;
+            }
+            
+            .panorama-view {
+                height: 400px;
+            }
+            
+            .location {
+                width: 60px;
+                height: 60px;
+            }
+            
+            .location-icon {
+                font-size: 1.4rem;
+            }
+            
+            .stat-value {
+                font-size: 1.5rem;
+            }
+        }
+        /* 模式徽章和浏览模式样式 */
+        .mode-badge {
+            position: fixed;
+            top: 18px;
+            left: 20px;
+            background: linear-gradient(90deg, var(--accent), var(--accent-dark));
+            color: var(--primary-dark);
+            padding: 8px 12px;
+            border-radius: 999px;
+            font-weight: 700;
+            box-shadow: 0 8px 18px rgba(126,207,255,0.18);
+            z-index: 1200;
+            border: 1px solid rgba(255,255,255,0.5);
+            cursor: pointer;
+            transition: all 0.3s ease;
+        }
+
+        .mode-badge:hover {
+            transform: scale(1.05);
+            box-shadow: 0 10px 20px rgba(126,207,255,0.25);
+        }
+
+        .browse-mode .choice-btn,
+        .browse-mode .action-btn {
+            opacity: 0.6;
+            filter: grayscale(0.3);
+            pointer-events: none;
+        }
+
+        .browse-mode .location {
+            opacity: 0.8;
+        }
+    </style>
+</head>
+<body>
+    <div id="modeBadge" class="mode-badge" title="点击切换模式">浏览模式</div>
+    <!-- 音乐控制 -->
+    <div class="music-controls">
+        <button class="music-btn" id="musicToggle">♪</button>
+        <div class="music-selector">
+            <button class="music-option" data-track="library">图书馆音乐</button>
+            <button class="music-option" data-track="panorama">地图音乐</button>
+            <button class="music-option" data-track="tavern">酒馆音乐</button>
+            <button class="music-option" data-track="forest">森林音乐</button>
+            <button class="music-option" data-track="temple">神庙音乐</button>
+            <button class="music-option" data-track="mountain">山脉音乐</button>
+            <button class="music-option" data-track="none">关闭音乐</button>
+        </div>
+    </div>
+    
+    <!-- 全景地图页面 -->
+    <div class="page active" id="panoramaPage">
+        <div class="container">
+            <header>
+                <h1>神秘宝藏探险</h1>
+                <p class="subtitle">选择探险地点开始你的寻宝之旅</p>
+            </header>
+            
+            <div class="stats">
+                <div class="stat-item">
+                    <div class="stat-label">成功次数</div>
+                    <div class="stat-value" id="panoramaSuccessCount">0</div>
+                </div>
+                <div class="stat-item">
+                    <div class="stat-label">失败次数</div>
+                    <div class="stat-value" id="panoramaFailCount">0</div>
+                </div>
+                <div class="stat-item">
+                    <div class="stat-label">总探险次数</div>
+                    <div class="stat-value" id="totalAdventures">0</div>
+                </div>
+            </div>
+            
+            <div class="panorama-view">
+                <div class="location library" data-location="library">
+                    <div class="location-icon">📚</div>
+                    <div class="location-name">古老图书馆</div>
+                </div>
+                <div class="location tavern" data-location="tavern">
+                    <div class="location-icon">🍺</div>
+                    <div class="location-name">冒险者酒馆</div>
+                </div>
+                <div class="location forest" data-location="forest">
+                    <div class="location-icon">🌲</div>
+                    <div class="location-name">神秘森林</div>
+                </div>
+                <div class="location temple" data-location="temple">
+                    <div class="location-icon">🛕</div>
+                    <div class="location-name">古老神庙</div>
+                </div>
+                <div class="location mountain" data-location="mountain">
+                    <div class="location-icon">⛰️</div>
+                    <div class="location-name">迷雾山脉</div>
+                </div>
+            </div>
+            
+            <div class="controls">
+                <button class="action-btn" id="continueBtn" style="display:none;">继续上次探险</button>
+                <button class="action-btn" id="resetBtnGlobal">重新开始游戏</button>
+            </div>
+            
+            <footer>
+                <p>神秘宝藏探险 &copy; 2025</p>
+            </footer>
+        </div>
+    </div>
+    
+    <!-- 游戏页面 -->
+    <div class="page" id="gamePage">
+        <div class="container">
+            <header>
+                <h1 id="locationTitle">神秘宝藏探险</h1>
+                <p class="subtitle" id="locationSubtitle">你的选择将决定寻宝的成败</p>
+            </header>
+            
+            <div class="stats">
+                <div class="stat-item">
+                    <div class="stat-label">当前步骤</div>
+                    <div class="stat-value" id="currentStep">0/3</div>
+                </div>
+                <div class="stat-item">
+                    <div class="stat-label">成功次数</div>
+                    <div class="stat-value" id="successCount">0</div>
+                </div>
+                <div class="stat-item">
+                    <div class="stat-label">失败次数</div>
+                    <div class="stat-value" id="failCount">0</div>
+                </div>
+            </div>
+            
+            <div class="game-area">
+                <div class="treasure-map">
+                    <div class="map-content">
+                        <div class="location-scene" id="locationScene">
+                            <div class="scene-emoji">🗺️</div>
+                            <div class="scene-title">探险准备</div>
+                            <div class="scene-description">选择一个地点开始你的寻宝之旅！</div>
+                        </div>
+                        <div class="clue-text" id="clueText">点击开始按钮，开启你的寻宝之旅！</div>
+                        <div class="choice-container" id="choiceContainer">
+                            <!-- 选择按钮将通过JS动态生成 -->
+                        </div>
+                    </div>
+                </div>
+                
+                <div class="step-indicator-container">
+                    <div class="step-indicator" id="stepIndicator">
+                        <!-- 步骤指示器将通过JS动态生成 -->
+                    </div>
+                </div>
+                
+                <div class="controls">
+                    <button class="action-btn" id="startBtn">开始寻宝</button>
+                    <button class="action-btn" id="resetBtn" disabled>重新开始</button>
+                    <button class="action-btn back-btn" id="backBtn">返回地图</button>
+                </div>
+                
+                <div id="resultArea"></div>
+            </div>
+            
+            <footer>
+                <p>神秘宝藏探险 &copy; 2025</p>
+            </footer>
+        </div>
+    </div>
+
+    <!-- 音频元素 -->
+    <audio id="backgroundMusic" loop>
+        您的浏览器不支持音频元素。
+    </audio>
+
+    <script>
+        // 游戏状态管理
+        class TreasureGame {
+            constructor() {
+                // 游戏状态
+                this.currentStep = 0;
+                this.isPlaying = false;
+                this.isBrowseMode = true; // 默认为浏览模式
+                this.playerChoices = [];
+                this.successCount = 0;
+                this.failCount = 0;
+                this.currentLocation = null;
+                this.visitedLocations = new Set();
+                this.collectedClues = [];
+                
+                this.gameState = {
+                    currentStep: 0,
+                    isPlaying: false,
+                    playerChoices: [],
+                    currentLocation: null,
+                    successCount: 0,
+                    failCount: 0,
+                    totalAdventures: 0
+                };
+
+                // 每个地点的独特探索内容
+                this.locationExplorations = {
+                    library: [
+                        {
+                            description: "你在布满灰尘的书架上发现了一本古老的地图册",
+                            choices: [
+                                { text: "仔细研究地图上的标记", emoji: "🗺️", clue: "地图上标记着一个神秘符号，指向酒馆方向" },
+                                { text: "寻找相关的历史文献", emoji: "📖", clue: "文献中提到'冒险者的聚集地可能有线索'" },
+                                { text: "检查书架的隐藏隔层", emoji: "🔍", clue: "发现一张写有'森林古树'的纸条" }
+                            ]
+                        },
+                        {
+                            description: "你找到了一本关于古代宝藏传说的书籍",
+                            choices: [
+                                { text: "阅读关于神庙祭祀的章节", emoji: "🛕", clue: "书中描述神庙祭坛藏有重要线索" },
+                                { text: "研究山脉地形图", emoji: "⛰️", clue: "地图显示山脉某处有异常标记" },
+                                { text: "寻找作者的笔记", emoji: "✍️", clue: "笔记提到'所有的线索都指向同一个地方'" }
+                            ]
+                        },
+                        {
+                            description: "你在图书馆的密室中发现了一个宝箱",
+                            choices: [
+                                { text: "尝试打开宝箱", emoji: "🔓", nextLocation: "tavern", clue: "宝箱中是酒馆的邀请函" },
+                                { text: "寻找开锁线索", emoji: "🗝️", nextLocation: "forest", clue: "发现指向森林的藏宝图碎片" },
+                                { text: "研究宝箱上的铭文", emoji: "🔎", nextLocation: "temple", clue: "铭文揭示神庙的秘密入口" }
+                            ]
+                        }
+                    ],
+                    tavern: [
+                        {
+                            description: "酒馆里聚集着各种冒险者，气氛热闹",
+                            choices: [
+                                { text: "向酒保打听消息", emoji: "🍺", clue: "酒保低声说'山脉深处有奇怪的光芒'" },
+                                { text: "与老冒险者交谈", emoji: "👴", clue: "老人讲述神庙中的神秘经历" },
+                                { text: "观察墙上的悬赏令", emoji: "📋", clue: "悬赏令描述森林中的异常现象" }
+                            ]
+                        },
+                        {
+                            description: "你在酒馆角落发现了一个神秘的陌生人",
+                            choices: [
+                                { text: "上前搭话", emoji: "🗣️", clue: "陌生人透露图书馆藏有重要文献" },
+                                { text: "偷偷观察", emoji: "👀", clue: "发现他在研究一张古老地图" },
+                                { text: "检查他留下的物品", emoji: "🎒", clue: "找到指向山脉的路线图" }
+                            ]
+                        },
+                        {
+                            description: "酒馆地下室藏着不为人知的秘密",
+                            choices: [
+                                { text: "探索酒窖", emoji: "🍷", nextLocation: "mountain", clue: "酒桶后发现山脉藏宝图" },
+                                { text: "检查秘密通道", emoji: "🚪", nextLocation: "forest", clue: "通道通向森林深处" },
+                                { text: "研究地下室地图", emoji: "🗺️", nextLocation: "temple", clue: "地图标记神庙位置" }
+                            ]
+                        }
+                    ],
+                    forest: [
+                        {
+                            description: "茂密的森林中充满了神秘的气息",
+                            choices: [
+                                { text: "沿着鹿的足迹前进", emoji: "🦌", clue: "足迹通向一处古老遗迹" },
+                                { text: "研究发光的植物", emoji: "🌿", clue: "植物光芒形成神秘图案" },
+                                { text: "倾听森林的声音", emoji: "👂", clue: "听到远处传来的钟声" }
+                            ]
+                        },
+                        {
+                            description: "森林深处有一座被遗忘的祭坛",
+                            choices: [
+                                { text: "检查祭坛铭文", emoji: "📜", clue: "铭文提到'知识的殿堂'" },
+                                { text: "寻找祭坛周围的线索", emoji: "🔍", clue: "发现图书馆的藏书标记" },
+                                { text: "观察祭坛结构", emoji: "🏛️", clue: "结构与神庙建筑相似" }
+                            ]
+                        },
+                        {
+                            description: "你在古树洞中发现了重要线索",
+                            choices: [
+                                { text: "取出树洞中的卷轴", emoji: "📜", nextLocation: "library", clue: "卷轴记载图书馆秘闻" },
+                                { text: "跟随树洞指引", emoji: "➡️", nextLocation: "mountain", clue: "树洞指向山脉方向" },
+                                { text: "研究树洞图案", emoji: "🔎", nextLocation: "temple", clue: "图案与神庙符号一致" }
+                            ]
+                        }
+                    ],
+                    temple: [
+                        {
+                            description: "古老的神庙庄严而神秘",
+                            choices: [
+                                { text: "研究墙壁上的壁画", emoji: "🎨", clue: "壁画描绘宝藏传说" },
+                                { text: "检查祭坛机关", emoji: "⚙️", clue: "机关需要特定顺序激活" },
+                                { text: "寻找隐藏的铭文", emoji: "🔍", clue: "铭文揭示下一步方向" }
+                            ]
+                        },
+                        {
+                            description: "神庙深处有一间密室",
+                            choices: [
+                                { text: "解读密室符号", emoji: "🔣", clue: "符号对应山脉地形" },
+                                { text: "检查密室宝座", emoji: "🪑", clue: "宝座下藏有地图碎片" },
+                                { text: "研究密室天象图", emoji: "⭐", clue: "星辰指向最终位置" }
+                            ]
+                        },
+                        {
+                            description: "你解开了神庙的最终谜题",
+                            choices: [
+                                { text: "激活中央祭坛", emoji: "✨", nextLocation: "mountain", clue: "祭坛光芒指向山脉" },
+                                { text: "打开秘密通道", emoji: "🚪", nextLocation: "treasure", clue: "通道通往最终宝藏", isFinal: true },
+                                { text: "研究最终启示", emoji: "📖", nextLocation: "library", clue: "启示需要更多文献验证" }
+                            ]
+                        }
+                    ],
+                    mountain: [
+                        {
+                            description: "险峻的山脉云雾缭绕",
+                            choices: [
+                                { text: "寻找登山路径", emoji: "🧗", clue: "发现古老的石阶" },
+                                { text: "研究山体结构", emoji: "⛰️", clue: "结构显示人工开凿痕迹" },
+                                { text: "观察山顶光芒", emoji: "💫", clue: "光芒来自特定位置" }
+                            ]
+                        },
+                        {
+                            description: "你在半山腰发现一个洞穴",
+                            choices: [
+                                { text: "探索洞穴深处", emoji: "🕳️", clue: "深处有神庙风格的雕刻" },
+                                { text: "检查洞穴壁画", emoji: "🎨", clue: "壁画描绘完整寻宝路线" },
+                                { text: "寻找洞穴出口", emoji: "🚪", clue: "出口通向更高处" }
+                            ]
+                        },
+                        {
+                            description: "山顶的祭坛散发着神秘能量",
+                            choices: [
+                                { text: "激活山顶祭坛", emoji: "⚡", nextLocation: "temple", clue: "能量指向神庙方向" },
+                                { text: "研究祭坛铭文", emoji: "📜", nextLocation: "treasure", clue: "铭文揭示宝藏位置", isFinal: true },
+                                { text: "观察祭坛天象", emoji: "🔭", nextLocation: "library", clue: "天象需要文献解读" }
+                            ]
+                        }
+                    ]
+                };
+
+                // 使用本地 music 文件夹下的音频资源
+                this.musicTracks = {
+                    panorama: "music/panorama.mp3",
+                    library: "music/library.mp3",
+                    tavern: "music/tavern.mp3",
+                    forest: "music/forest.mp3",
+                    temple: "music/temple.mp3",
+                    mountain: "music/mountain.mp3"
+                };
+                
+                this.currentTrack = null;
+                this.isMusicPlaying = false;
+                this.userInteracted = false;
+                
+                this.init();
+                this.loadGameState();
+            }
+
+            init() {
+                // 获取DOM元素
+                this.panoramaPage = document.getElementById('panoramaPage');
+                this.gamePage = document.getElementById('gamePage');
+                this.locationTitle = document.getElementById('locationTitle');
+                this.locationSubtitle = document.getElementById('locationSubtitle');
+                this.startBtn = document.getElementById('startBtn');
+                this.resetBtn = document.getElementById('resetBtn');
+                this.resetBtnGlobal = document.getElementById('resetBtnGlobal');
+                this.backBtn = document.getElementById('backBtn');
+                this.continueBtn = document.getElementById('continueBtn');
+                this.clueText = document.getElementById('clueText');
+                this.stepIndicator = document.getElementById('stepIndicator');
+                this.resultArea = document.getElementById('resultArea');
+                this.locationScene = document.getElementById('locationScene');
+                this.choiceContainer = document.getElementById('choiceContainer');
+                this.currentStepElement = document.getElementById('currentStep');
+                this.successCountElement = document.getElementById('successCount');
+                this.failCountElement = document.getElementById('failCount');
+                this.panoramaSuccessCount = document.getElementById('panoramaSuccessCount');
+                this.panoramaFailCount = document.getElementById('panoramaFailCount');
+                this.totalAdventures = document.getElementById('totalAdventures');
+                this.musicToggle = document.getElementById('musicToggle');
+                this.backgroundMusic = document.getElementById('backgroundMusic');
+                this.modeBadge = document.getElementById('modeBadge');
+                
+                this.createStepIndicators();
+                this.bindEvents();
+                this.updateStats();
+                this.updatePanoramaStats();
+                this.updateModeDisplay();
+                
+                // 显示音乐提示
+                this.showMusicHint();
+            }
+
+            // 更新模式显示和交互
+            updateModeDisplay() {
+                if (this.isBrowseMode) {
+                    this.modeBadge.textContent = '浏览模式';
+                    this.modeBadge.title = '点击开始游戏';
+                    document.body.classList.add('browse-mode');
+                    if (this.startBtn) this.startBtn.textContent = '开始寻宝';
+                } else {
+                    this.modeBadge.textContent = '游戏模式';
+                    this.modeBadge.title = '点击进入浏览模式';
+                    document.body.classList.remove('browse-mode');
+                    if (this.startBtn) this.startBtn.textContent = '继续探索';
+                }
+            }
+
+            // 切换模式
+            toggleMode() {
+                this.isBrowseMode = !this.isBrowseMode;
+                this.updateModeDisplay();
+                
+                if (this.isBrowseMode && this.currentLocation) {
+                    // 切换到浏览模式时显示预览选项
+                    this.showCurrentLocationChoices();
+                }
+            }
+
+            createStepIndicators() {
+                this.stepIndicator.innerHTML = '';
+                for (let i = 0; i < 3; i++) {
+                    const stepEl = document.createElement('div');
+                    stepEl.className = 'step';
+
+                    const circleEl = document.createElement('div');
+                    circleEl.className = 'step-circle';
+                    circleEl.textContent = i + 1;
+
+                    const labelEl = document.createElement('div');
+                    labelEl.className = 'step-label';
+                    labelEl.textContent = `探索 ${i + 1}`;
+
+                    stepEl.appendChild(circleEl);
+                    stepEl.appendChild(labelEl);
+                    this.stepIndicator.appendChild(stepEl);
+                }
+            }
+
+            bindEvents() {
+                this.startBtn.addEventListener('click', () => this.startAdventure());
+                this.resetBtn.addEventListener('click', () => this.resetCurrentGame());
+                this.resetBtnGlobal.addEventListener('click', () => this.resetCurrentGame());
+                this.backBtn.addEventListener('click', () => this.showPanorama());
+                this.continueBtn.addEventListener('click', () => this.continueGame());
+                this.musicToggle.addEventListener('click', () => this.toggleMusic());
+                this.modeBadge.addEventListener('click', () => this.toggleMode());
+                
+                // 绑定地点点击事件
+                document.querySelectorAll('.location').forEach(location => {
+                    location.addEventListener('click', (e) => {
+                        const locationName = e.currentTarget.dataset.location;
+                        this.selectLocation(locationName);
+                    });
+                });
+                
+                // 绑定音乐选择事件
+                document.querySelectorAll('.music-option').forEach(option => {
+                    option.addEventListener('click', (e) => {
+                        const track = e.currentTarget.dataset.track;
+                        this.selectMusic(track);
+                    });
+                });
+                
+                // 用户交互事件
+                document.addEventListener('click', () => {
+                    this.userInteracted = true;
+                });
+            }
+
+            // 保存游戏状态到localStorage
+            saveGameState() {
+                this.gameState = {
+                    currentStep: this.currentStep,
+                    isPlaying: this.isPlaying,
+                    playerChoices: this.playerChoices,
+                    currentLocation: this.currentLocation,
+                    successCount: this.successCount,
+                    failCount: this.failCount,
+                    totalAdventures: this.gameState.totalAdventures,
+                    visitedLocations: Array.from(this.visitedLocations),
+                    collectedClues: this.collectedClues,
+                    isBrowseMode: this.isBrowseMode
+                };
+                
+                localStorage.setItem('treasureGameState', JSON.stringify(this.gameState));
+            }
+
+            // 从localStorage加载游戏状态
+            loadGameState() {
+                const savedState = localStorage.getItem('treasureGameState');
+                if (savedState) {
+                    this.gameState = JSON.parse(savedState);
+                    
+                    this.currentStep = this.gameState.currentStep;
+                    this.isPlaying = this.gameState.isPlaying;
+                    this.playerChoices = this.gameState.playerChoices;
+                    this.currentLocation = this.gameState.currentLocation;
+                    this.successCount = this.gameState.successCount || 0;
+                    this.failCount = this.gameState.failCount || 0;
+                    this.visitedLocations = new Set(this.gameState.visitedLocations || []);
+                    this.collectedClues = this.gameState.collectedClues || [];
+                    this.isBrowseMode = this.gameState.isBrowseMode !== undefined ? this.gameState.isBrowseMode : true;
+                    
+                    if (this.isPlaying && this.currentLocation) {
+                        this.continueBtn.style.display = 'block';
+                    }
+                    
+                    this.updateStats();
+                    this.updatePanoramaStats();
+                    this.updateModeDisplay();
+                }
+
+                // 恢复单独保存的 currentTrack（如果有）并更新 UI
+                try {
+                    const savedTrack = localStorage.getItem('currentTrack');
+                    if (savedTrack && savedTrack !== 'none' && this.musicTracks[savedTrack]) {
+                        this.backgroundMusic.src = this.musicTracks[savedTrack];
+                        this.currentTrack = savedTrack;
+                        document.querySelectorAll('.music-option').forEach(option => {
+                            option.classList.remove('active');
+                            if (option.dataset.track === savedTrack) option.classList.add('active');
+                        });
+
+                        // 如果之前处于播放状态，尝试恢复（需要用户交互）
+                        if (this.gameState.isPlaying === false && this.isMusicPlaying) {
+                            // do nothing, handled by user interaction
+                        }
+                    } else if (savedTrack === 'none') {
+                        // 用户之前关闭了音乐
+                        document.querySelectorAll('.music-option').forEach(option => {
+                            option.classList.remove('active');
+                            if (option.dataset.track === 'none') option.classList.add('active');
+                        });
+                        this.currentTrack = null;
+                    }
+                } catch (e) {
+                    console.error('恢复音乐设置失败', e);
+                }
+            }
+
+            updateStats() {
+                this.currentStepElement.textContent = `${this.currentStep}/3`;
+                this.successCountElement.textContent = this.successCount;
+                this.failCountElement.textContent = this.failCount;
+            }
+
+            updatePanoramaStats() {
+                this.panoramaSuccessCount.textContent = this.successCount;
+                this.panoramaFailCount.textContent = this.failCount;
+                // 总探险次数 = 成功次数 + 失败次数
+                this.totalAdventures.textContent = this.successCount + this.failCount;
+            }
+
+            selectLocation(location) {
+                this.currentLocation = location;
+                this.showGamePage();
+                
+                const locationData = {
+                    library: { title: "古老图书馆", subtitle: "在尘封的书籍中寻找线索" },
+                    tavern: { title: "冒险者酒馆", subtitle: "从老练的冒险者那里获取情报" },
+                    forest: { title: "神秘森林", subtitle: "穿越危险的森林寻找宝藏" },
+                    temple: { title: "古老神庙", subtitle: "解开神庙中的古老谜题" },
+                    mountain: { title: "迷雾山脉", subtitle: "攀登险峻的山峰寻找宝藏" }
+                };
+                
+                if (locationData[location]) {
+                    this.locationTitle.textContent = locationData[location].title;
+                    this.locationSubtitle.textContent = locationData[location].subtitle;
+                }
+                
+                // 显示场景
+                this.displayScene(location, 0);
+                this.selectMusic(location);
+                
+                if (this.startBtn) this.startBtn.disabled = false;
+                this.createStepIndicators();
+                
+                // 显示该地点的探索选项
+                this.showCurrentLocationChoices();
+            }
+
+            // 显示当前地点的探索选项
+            showCurrentLocationChoices() {
+                if (!this.currentLocation || !this.locationExplorations[this.currentLocation]) {
+                    this.showChoices([
+                        { text: "开始探索这个地点", emoji: "🔍" },
+                        { text: "寻找线索", emoji: "🔎" },
+                        { text: "调查环境", emoji: "🗺️" }
+                    ]);
+                    return;
+                }
+
+                const exploration = this.locationExplorations[this.currentLocation][this.currentStep];
+                if (exploration) {
+                    this.clueText.textContent = exploration.description;
+                    this.showChoices(exploration.choices);
+                }
+            }
+
+            displayScene(location, stepIndex = 0) {
+                const sceneData = {
+                    library: { emoji: "📚", title: "古老图书馆", description: "尘封的书籍中藏着古老的秘密" },
+                    tavern: { emoji: "🍺", title: "冒险者酒馆", description: "老练的冒险者们分享着他们的故事" },
+                    forest: { emoji: "🌲", title: "神秘森林", description: "茂密的树林中隐藏着未知的危险" },
+                    temple: { emoji: "🛕", title: "古老神庙", description: "庄严的神庙中藏着古老的谜题" },
+                    mountain: { emoji: "⛰️", title: "迷雾山脉", description: "险峻的山峰被浓雾笼罩" }
+                };
+
+                const data = sceneData[location] || { emoji: "🗺️", title: "未知地点", description: "探索这个神秘的地方" };
+                
+                this.locationScene.innerHTML = `
+                    <div class="scene-emoji">${data.emoji}</div>
+                    <div class="scene-title">${data.title}</div>
+                    <div class="scene-description">${data.description}</div>
+                `;
+            }
+
+            showGamePage() {
+                this.panoramaPage.classList.remove('active');
+                this.gamePage.classList.add('active');
+            }
+
+            showPanorama() {
+                this.gamePage.classList.remove('active');
+                this.panoramaPage.classList.add('active');
+                // 当返回地图页面时，切换到地图背景音乐（如果用户没有选择关闭音乐）
+                try {
+                    const savedTrack = localStorage.getItem('currentTrack');
+                    if (savedTrack === 'none') {
+                        // 用户之前选择关闭音乐，则不自动播放或切换
+                    } else {
+                        // 切换到 panorama 作为地图背景音乐
+                        this.selectMusic('panorama');
+                        // 如果用户已经与页面交互过，尝试自动播放
+                        if (this.userInteracted) {
+                            this.playMusic();
+                        }
+                    }
+                } catch (e) {}
+
+                this.saveGameState();
+            }
+
+            continueGame() {
+                if (this.currentLocation) {
+                    this.selectLocation(this.currentLocation);
+                    
+                    if (this.isPlaying) {
+                        this.showClue("继续上次的探险...");
+                        setTimeout(() => {
+                            this.showCurrentLocationChoices();
+                        }, 1500);
+                    }
+                }
+            }
+
+            // 音乐控制方法
+            toggleMusic() {
+                if (this.isMusicPlaying) {
+                    this.backgroundMusic.pause();
+                    this.isMusicPlaying = false;
+                    this.musicToggle.textContent = '♪';
+                } else if (this.currentTrack) {
+                    this.playMusic();
+                } else {
+                    if (this.currentLocation) {
+                        this.selectMusic(this.currentLocation);
+                    } else {
+                        this.selectMusic('library');
+                    }
+                }
+            }
+
+            playMusic() {
+                if (!this.userInteracted) {
+                    this.showMusicHint();
+                    return;
+                }
+                
+                this.backgroundMusic.volume = 0.5;
+                this.backgroundMusic.play().then(() => {
+                    this.isMusicPlaying = true;
+                    this.musicToggle.textContent = '♫';
+                }).catch(e => {
+                    console.error("音乐播放失败:", e);
+                    this.showMusicHint();
+                });
+            }
+
+            showMusicHint() {
+                try {
+                    if (localStorage.getItem('musicHintDismissed') === '1' || this.userInteracted) return;
+                } catch (e) {}
+
+                const existingHint = document.querySelector('.music-hint');
+                if (existingHint) {
+                    existingHint.remove();
+                }
+
+                const hint = document.createElement('div');
+                hint.className = 'music-hint';
+                hint.innerHTML = `
+                    <h3>音乐播放提示</h3>
+                    <p>请点击页面任意位置以启用音乐播放</p>
+                    <p>某些浏览器需要用户交互才能播放音频</p>
+                    <button class="music-hint-btn" id="closeMusicHint">确定</button>
+                `;
+                document.body.appendChild(hint);
+
+                document.getElementById('closeMusicHint').addEventListener('click', () => {
+                    hint.remove();
+                    this.userInteracted = true;
+                    try {
+                        localStorage.setItem('musicHintDismissed', '1');
+                    } catch (e) {}
+                });
+            }
+
+            selectMusic(track) {
+                if (track === 'none') {
+                    this.backgroundMusic.pause();
+                    this.isMusicPlaying = false;
+                    this.currentTrack = null;
+                    this.musicToggle.textContent = '♪';
+                    localStorage.setItem('currentTrack', 'none');
+                    return;
+                }
+                
+                if (this.musicTracks[track]) {
+                    this.backgroundMusic.src = this.musicTracks[track];
+                    this.currentTrack = track;
+                    localStorage.setItem('currentTrack', track);
+                    
+                    document.querySelectorAll('.music-option').forEach(option => {
+                        option.classList.remove('active');
+                        if (option.dataset.track === track) {
+                            option.classList.add('active');
+                        }
+                    });
+                    
+                    if (this.isMusicPlaying) {
+                        this.playMusic();
+                    }
+                }
+            }
+
+            async startAdventure() {
+                if (this.isBrowseMode) {
+                    // 从浏览模式切换到游戏模式
+                    this.isBrowseMode = false;
+                    this.updateModeDisplay();
+                }
+
+                if (!this.currentLocation) {
+                    this.showClue('请先选择一个地点开始冒险');
+                    return;
+                }
+
+                this.isPlaying = true;
+                this.startBtn.disabled = true;
+                this.resetBtn.disabled = false;
+                this.resultArea.innerHTML = '';
+                this.playerChoices = [];
+                this.currentStep = 0;
+                this.visitedLocations.clear();
+                this.collectedClues = [];
+                
+                this.saveGameState();
+                this.updatePanoramaStats();
+                
+                try {
+                    await this.beginAdventure();
+                } catch (error) {
+                    this.showError(error);
+                }
+            }
+
+            // 重新开始当前游戏（算作失败）
+            resetCurrentGame() {
+                // 如果游戏正在进行中，记录为失败
+                if (this.isPlaying) {
+                    this.failCount++;
+                    this.showClue("你放弃了当前的探险...");
+                }
+                
+                this.currentStep = 0;
+                this.isPlaying = false;
+                this.startBtn.disabled = false;
+                this.resetBtn.disabled = true;
+                this.clueText.textContent = "点击开始按钮，开启你的寻宝之旅！";
+                this.updateStepIndicators();
+                this.currentStepElement.textContent = `0/3`;
+                this.resultArea.innerHTML = '';
+                if (this.currentLocation) {
+                    this.displayScene(this.currentLocation, 0);
+                }
+                this.choiceContainer.innerHTML = '';
+                this.updateStepIndicators();
+                this.updateStats();
+                this.updatePanoramaStats();
+                this.saveGameState();
+                
+                // 重新显示当前地点的选项
+                if (this.currentLocation) {
+                    this.showCurrentLocationChoices();
+                }
+            }
+
+            updateStepIndicators() {
+                const steps = this.stepIndicator.querySelectorAll('.step-circle');
+                steps.forEach((step, index) => {
+                    step.classList.remove('active', 'completed');
+                    if (index === this.currentStep) {
+                        step.classList.add('active');
+                    } else if (index < this.currentStep) {
+                        step.classList.add('completed');
+                    }
+                });
+            }
+
+            showClue(text) {
+                this.clueText.textContent = text;
+                this.clueText.classList.add('animated-text');
+                
+                setTimeout(() => {
+                    this.clueText.classList.remove('animated-text');
+                }, 2000);
+            }
+
+            showChoices(choices) {
+                this.choiceContainer.innerHTML = '';
+                choices.forEach((choice, index) => {
+                    const button = document.createElement('button');
+                    button.className = 'choice-btn';
+                    button.innerHTML = `
+                        <span class="choice-emoji">${choice.emoji}</span>
+                        <span>${choice.text}</span>
+                    `;
+                    button.addEventListener('click', () => this.handleChoice(choice));
+                    this.choiceContainer.appendChild(button);
+                });
+            }
+
+            async beginAdventure() {
+                this.currentStep = 0;
+                this.updateStepIndicators();
+                this.updateStats();
+
+                this.showClue("你开始了寻宝之旅...");
+                await this.delay(1500);
+
+                this.showClue(`你来到了 ${this.locationTitle.textContent}...`);
+                await this.delay(1200);
+                
+                this.visitedLocations.add(this.currentLocation);
+                this.showCurrentLocationChoices();
+            }
+
+            async handleChoice(choice) {
+                if (this.isBrowseMode) {
+                    // 浏览模式下的点击只显示提示，不推进游戏
+                    this.showClue(`预览: ${choice.text}`);
+                    return;
+                }
+
+                this.playerChoices.push(choice.text);
+                this.showThinking();
+                
+                try {
+                    await this.delay(1500);
+
+                    // 记录线索
+                    if (choice.clue) {
+                        this.collectedClues.push({
+                            location: this.currentLocation,
+                            step: this.currentStep,
+                            clue: choice.clue
+                        });
+                    }
+
+                    this.showClue(`你选择了: ${choice.text}`);
+                    await this.delay(1200);
+
+                    if (choice.clue) {
+                        this.showClue(choice.clue);
+                        await this.delay(1500);
+                    }
+
+                    // 检查是否需要前往下一个地点
+                    if (choice.nextLocation) {
+                        if (choice.isFinal) {
+                            await this.completeAdventure(true);
+                        } else {
+                            await this.travelToLocation(choice.nextLocation);
+                        }
+                    } else {
+                        // 继续在当前地点探索
+                        this.currentStep++;
+                        this.updateStepIndicators();
+                        this.updateStats();
+
+                        if (this.currentStep < 3) {
+                            this.showCurrentLocationChoices();
+                        } else {
+                            // 完成当前地点探索，随机选择下一个地点
+                            const nextLocations = ['library', 'tavern', 'forest', 'temple', 'mountain']
+                                .filter(loc => loc !== this.currentLocation && !this.visitedLocations.has(loc));
+                            
+                            if (nextLocations.length > 0) {
+                                const nextLocation = nextLocations[Math.floor(Math.random() * nextLocations.length)];
+                                await this.travelToLocation(nextLocation);
+                            } else {
+                                // 所有地点都探索过了
+                                await this.completeAdventure(true);
+                            }
+                        }
+                    }
+                    
+                    this.saveGameState();
+                } catch (error) {
+                    this.showError(error);
+                }
+            }
+
+            async travelToLocation(location) {
+                this.currentLocation = location;
+                this.currentStep = 0;
+                this.visitedLocations.add(location);
+                
+                const locationData = {
+                    library: { title: "古老图书馆", subtitle: "在尘封的书籍中寻找线索" },
+                    tavern: { title: "冒险者酒馆", subtitle: "从老练的冒险者那里获取情报" },
+                    forest: { title: "神秘森林", subtitle: "穿越危险的森林寻找宝藏" },
+                    temple: { title: "古老神庙", subtitle: "解开神庙中的古老谜题" },
+                    mountain: { title: "迷雾山脉", subtitle: "攀登险峻的山峰寻找宝藏" }
+                };
+                
+                if (locationData[location]) {
+                    this.locationTitle.textContent = locationData[location].title;
+                    this.locationSubtitle.textContent = locationData[location].subtitle;
+                }
+                
+                this.displayScene(location, 0);
+                this.selectMusic(location);
+                this.updateStepIndicators();
+                this.updateStats();
+                
+                this.showClue(`你前往${this.getLocationName(location)}继续寻找线索...`);
+                await this.delay(1500);
+                this.showCurrentLocationChoices();
+            }
+
+            getLocationName(locationKey) {
+                const names = {
+                    library: "图书馆",
+                    tavern: "酒馆", 
+                    forest: "森林",
+                    temple: "神庙",
+                    mountain: "山脉",
+                    treasure: "宝藏所在地"
+                };
+                return names[locationKey] || locationKey;
+            }
+
+            showThinking() {
+                this.choiceContainer.innerHTML = `
+                    <div class="thinking-container">
+                        <div class="thinking-text">思考中</div>
+                        <div class="thinking-animation">
+                            <div class="thinking-dot"></div>
+                            <div class="thinking-dot"></div>
+                            <div class="thinking-dot"></div>
+                        </div>
+                    </div>
+                `;
+            }
+
+            async completeAdventure(success) {
+                if (success) {
+                    this.successCount++;
+                    this.showSuccess();
+                } else {
+                    this.failCount++;
+                    this.showFailure();
+                }
+                
+                this.isPlaying = false;
+                this.startBtn.disabled = false;
+                this.saveGameState();
+                this.updatePanoramaStats();
+            }
+
+            showSuccess() {
+                this.resultArea.innerHTML = `
+                    <div class="success-message">
+                        <div class="treasure-animation">💰</div>
+                        <h2>恭喜！你找到了宝藏！</h2>
+                        <p>你的探索路径：${Array.from(this.visitedLocations).map(loc => this.getLocationName(loc)).join(' → ')}</p>
+                        <p>收集的线索：${this.collectedClues.length} 个</p>
+                        <div class="treasure-items">
+                            <div class="treasure-item">💎</div>
+                            <div class="treasure-item">👑</div>
+                            <div class="treasure-item">🗝️</div>
+                            <div class="treasure-item">⚜️</div>
+                        </div>
+                        <p>通过智慧与勇气，你成功找到了传说中的宝藏！</p>
+                    </div>
+                `;
+                this.clueText.textContent = "恭喜你成功找到了宝藏！";
+                this.locationScene.innerHTML = `
+                    <div class="scene-emoji">🏆</div>
+                    <div class="scene-title">寻宝成功！</div>
+                    <div class="scene-description">你成功找到了传说中的宝藏！</div>
+                `;
+            }
+
+            showFailure() {
+                this.resultArea.innerHTML = `
+                    <div class="error-message">
+                        <h2>很遗憾，寻宝失败了</h2>
+                        <p>你的探索路径：${Array.from(this.visitedLocations).map(loc => this.getLocationName(loc)).join(' → ')}</p>
+                        <p>在寻宝过程中，你没能找到关键的线索。不要灰心，下次再来！</p>
+                    </div>
+                `;
+                this.clueText.textContent = "很遗憾，这次寻宝失败了。";
+                this.locationScene.innerHTML = `
+                    <div class="scene-emoji">😔</div>
+                    <div class="scene-title">寻宝失败</div>
+                    <div class="scene-description">这次没有找到宝藏，下次再试试吧！</div>
+                `;
+            }
+
+            showError(error) {
+                this.resultArea.innerHTML = `
+                    <div class="error-message">
+                        <h2>发生错误</h2>
+                        <p>${error.message || '未知错误'}</p>
+                    </div>
+                `;
+            }
+
+            delay(ms) {
+                return new Promise(resolve => setTimeout(resolve, ms));
+            }
+        }
+
+        // 初始化游戏
+        document.addEventListener('DOMContentLoaded', () => {
+            const game = new TreasureGame();
+            
+            window.addEventListener('beforeunload', () => {
+                game.saveGameState();
+            });
+        });
+    </script>
+</body>
+</html>
